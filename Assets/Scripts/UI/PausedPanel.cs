@@ -23,7 +23,8 @@ public class PausedPanel : MonoBehaviour
 
     private void RestartLevelGame()
     {
-        Debug.Log("LevelRestart");
+        PausedControl.Instance.TogglePause();
+        SceneManager.LoadScene("Level1");
     }
 
     private void OptionPanel()
@@ -34,7 +35,7 @@ public class PausedPanel : MonoBehaviour
 
     private void LoadMainMenu()
     {
-        //SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("MainMenu");
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

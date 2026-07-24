@@ -3,9 +3,12 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private PlayerControl playerControlScript;
+    private Recorder recorder;
     Vector2 direction;
     Rigidbody rb;
+    Ray ray;
     bool jumpPressed = false;
+    private float jumpCooldownTimerValue = 0f;
 
     [SerializeField] private float movementSpeed;
     [SerializeField] private float jumpForce;
@@ -13,12 +16,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask layerToHit;
     [SerializeField] private Camera cam;
     [SerializeField] private Transform playerModel;
+    [SerializeField] private float jumpCooldownTimer;
+    [Header("Collision")]
+    [SerializeField] private Transform groundCheck; 
+    
 
-    private void OnEnable()
-    {
-        playerControlScript.OnMove += HandleDirection;
-        playerControlScript.OnJumpPressed += JumpPressed;
-    }
 
     private void OnDisable()
     {
@@ -30,22 +32,32 @@ public class PlayerMovement : MonoBehaviour
     {
         playerControlScript = GetComponent<PlayerControl>();
         rb = GetComponent<Rigidbody>();
+        recorder = GetComponent<Recorder>();
     }
 
     void Start()
     {
-        
+
+        playerControlScript.OnMove += HandleDirection;
+        playerControlScript.OnJumpPressed += JumpPressed;
     }
 
     private void Update()
     {
+        if (jumpCooldownTimerValue > 0) jumpCooldownTimerValue -= Time.deltaTime;
+        Debug.DrawRay(groundCheck.position, Vector3.down * distanceToGround, Color.red);
+    }
+
+    private void LateUpdate()
+    {
+        ReplayData data = new ReplayData(this.transform.position);
+
+        recorder.RecordReplayFrame(data);
     }
 
     void FixedUpdate()
     {
         Movement();
-        HandleJump();
-        Debug.DrawRay(transform.position, Vector3.down, Color.red);
     }
 
     private void HandleDirection(Vector2 dir)
@@ -82,30 +94,27 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isGrounded()
     {
-        Ray ray;
-        ray = new Ray(transform.position, Vector3.down);
-        if (Physics.Raycast(ray, out RaycastHit hit, distanceToGround, layerToHit))
-        {
-            return true;
-        }
-        return false;
+        Ray groundRay = new Ray(groundCheck.position, Vector3.down);
+        return Physics.Raycast(groundRay, distanceToGround, layerToHit);
     }
 
     private void HandleJump()
     {
-        if (jumpPressed && isGrounded())
+        if ((jumpPressed && isGrounded()))
         {
             //rb.linearVelocity = new Vector3(0, jumpForce, 0) * Time.deltaTime;
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
-
             Debug.Log("Jump is pressed!");
             jumpPressed = false;
+            jumpCooldownTimerValue = jumpCooldownTimer;
         }
     }
 
     private void JumpPressed()
     {
+        if (jumpCooldownTimerValue > 0) return;
         jumpPressed = true;
+        HandleJump();
     }
 
 

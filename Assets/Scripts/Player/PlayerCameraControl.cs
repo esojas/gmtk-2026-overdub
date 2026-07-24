@@ -26,7 +26,10 @@ public class PlayerCameraControl : MonoBehaviour
     {
         turnSpeed = PlayerSettings.Sensitivity;
         PlayerSettings.OnSensitivityChanged += OnSensitivityChanged;
-        SetCameraTarget(playerGameObject.transform);
+        SetCameraTarget(playerGameObject);
+
+        GameEventsManager.Instance.onChangeCameraTarget += SetCameraTarget;
+        GameEventsManager.Instance.onRestartLevel += OnRestartLevel;
     }
 
     private void OnSensitivityChanged(float newSensitivity)
@@ -37,12 +40,15 @@ public class PlayerCameraControl : MonoBehaviour
     private void OnDestroy()
     {
         PlayerSettings.OnSensitivityChanged -= OnSensitivityChanged;
+
+        GameEventsManager.Instance.onChangeCameraTarget -= SetCameraTarget;
+        GameEventsManager.Instance.onRestartLevel -= OnRestartLevel;
     }
 
 
-    public void SetCameraTarget(Transform playerTarget)
+    public void SetCameraTarget(GameObject playerTarget)
     {
-        target = playerTarget;
+        target = playerTarget.transform;
 
         if (target != null) 
         {
@@ -53,6 +59,11 @@ public class PlayerCameraControl : MonoBehaviour
         {
             //Debug.LogWarning("CharacterData not found!");
         }
+    }
+
+    public void OnRestartLevel()
+    {
+
     }
 
 
