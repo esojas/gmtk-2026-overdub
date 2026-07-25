@@ -16,10 +16,10 @@ public class PausedControl : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.None; // temp
-
         PlayerControl.Instance.OnPausePressed += TogglePause;
         PlayerControl.Instance.OnUnPausedPressed += TogglePause;
+
+        Cursor.lockState = CursorLockMode.Locked; // temp
     }
 
     private void OnDisable()

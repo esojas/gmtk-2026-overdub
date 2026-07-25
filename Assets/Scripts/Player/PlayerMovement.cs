@@ -1,14 +1,17 @@
+using System;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     private PlayerControl playerControlScript;
+    private PlayerDeath playerDeathScript;
     private Recorder recorder;
     Vector2 direction;
     Rigidbody rb;
     Ray ray;
     bool jumpPressed = false;
     private float jumpCooldownTimerValue = 0f;
+    private Renderer playerRenderer;
 
     [SerializeField] private float movementSpeed;
     [SerializeField] private float jumpForce;
@@ -18,11 +21,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform playerModel;
     [SerializeField] private float jumpCooldownTimer;
     [Header("Collision")]
-    [SerializeField] private Transform groundCheck; 
-    
+    [SerializeField] private Transform groundCheck;
 
+    public bool deathThisFrame = false;
+    public bool isVisible;
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         playerControlScript.OnMove -= HandleDirection;
         playerControlScript.OnJumpPressed -= JumpPressed;
@@ -33,10 +37,13 @@ public class PlayerMovement : MonoBehaviour
         playerControlScript = GetComponent<PlayerControl>();
         rb = GetComponent<Rigidbody>();
         recorder = GetComponent<Recorder>();
+        playerDeathScript = GetComponent<PlayerDeath>();
+        playerRenderer = GetComponent<Renderer>();
     }
 
     void Start()
     {
+        isVisible = playerRenderer.enabled;
 
         playerControlScript.OnMove += HandleDirection;
         playerControlScript.OnJumpPressed += JumpPressed;
@@ -50,9 +57,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void LateUpdate()
     {
-        ReplayData data = new ReplayData(this.transform.position);
+        isVisible = playerRenderer.enabled;
+
+        ReplayData data = new PlayerReplayData(this.transform.position, isGrounded(), rb.linearVelocity, this.transform.rotation, deathThisFrame, isVisible);
 
         recorder.RecordReplayFrame(data);
+
+        deathThisFrame = false;
     }
 
     void FixedUpdate()
