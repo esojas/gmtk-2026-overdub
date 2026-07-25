@@ -13,6 +13,8 @@ public class GameEventsManager : MonoBehaviour
 
     public event Action onPlayerRespawn;
 
+    public event Action onPlayerStartLevel;
+
     private void Awake()
     {
         if (Instance != null) Debug.LogError("There is more than one Game Event manager in the scene!");
@@ -22,6 +24,11 @@ public class GameEventsManager : MonoBehaviour
     public void GoalReached()
     {
         if(onGoalReached!= null) onGoalReached();
+    }
+
+    public void StartLevel()
+    {
+        if(onPlayerStartLevel!= null) onPlayerStartLevel();
     }
 
     public void RestartLevel()

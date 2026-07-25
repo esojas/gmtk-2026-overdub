@@ -14,6 +14,7 @@ public class Recorder : MonoBehaviour
 
     private List<Recording> recordings;
     private bool isDoingReplay = false;
+    private int replayPlayed = 0;
 
     private void Awake()
     {
@@ -26,6 +27,7 @@ public class Recorder : MonoBehaviour
         // subscribe to events
         GameEventsManager.Instance.onGoalReached += OnGoalReached;
         GameEventsManager.Instance.onRestartLevel += OnRestartLevel;
+        GameEventsManager.Instance.onPlayerStartLevel += StartLevel;
     }
 
     private void OnDestroy()
@@ -33,9 +35,15 @@ public class Recorder : MonoBehaviour
         // unsubscribe from events
         GameEventsManager.Instance.onGoalReached -= OnGoalReached;
         GameEventsManager.Instance.onRestartLevel -= OnRestartLevel;
+        GameEventsManager.Instance.onPlayerStartLevel -= StartLevel;
     }
 
     private void OnGoalReached()
+    {
+        //Start next level and move ts somehwere else.
+    }
+
+    private void StartLevel()
     {
         StartReplay();
     }
@@ -57,18 +65,19 @@ public class Recorder : MonoBehaviour
             return;
         }
 
-        bool hasMoreFrames = false;
+        bool anyRecordingHasMoreFrames = false;
         foreach (Recording recording in recordings)
         {
-            // the result of this will always be from the
-            // last recording in the list, which will be the successful playthrough
-            hasMoreFrames = recording.PlayNextFrame();
+            if (recording.PlayNextFrame())
+            {
+                anyRecordingHasMoreFrames = true;
+            }
         }
 
         // check if we're finished, so we can restart
-        if (!hasMoreFrames)
+        if (!anyRecordingHasMoreFrames)
         {
-            RestartReplay();
+            isDoingReplay = false;
         }
     }
 
@@ -80,22 +89,27 @@ public class Recorder : MonoBehaviour
     private void StartReplay()
     {
         isDoingReplay = true;
+        foreach (Recording recording in recordings)
+        {
+            recording.RestartFromBeginning();
+        }
+
         AddRecording();
-        // instantiate all of the replay object in our scene
+
         foreach (Recording recording in recordings)
         {
             recording.InstantiateReplayObject(replayObjectPrefab);
         }
-        // change the camera target to the replay object
-        if (newCameraTarget)
-        {
-            Recording lastRecording = recordings[recordings.Count - 1];
-            GameEventsManager.Instance.ChangeCameraTarget(lastRecording.replayObject.gameObject);
-        }
+
     }
 
     private void AddRecording()
     {
+        if (recordingQueue.Count == 0)
+        {
+            return; // nothing was recorded, no point creating an empty Recording
+        }
+
         // add the recording
         recordings.Add(new Recording(recordingQueue));
         // reset the current recording queue for next time
@@ -105,10 +119,14 @@ public class Recorder : MonoBehaviour
     private void RestartReplay()
     {
         isDoingReplay = true;
-        // restart our queued data from the beginning
         foreach (Recording recording in recordings)
         {
             recording.RestartFromBeginning();
+
+            if (recording.replayObject == null)
+            {
+                recording.InstantiateReplayObject(replayObjectPrefab);
+            }
         }
     }
 

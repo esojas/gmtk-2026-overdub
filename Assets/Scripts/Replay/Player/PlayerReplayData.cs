@@ -8,17 +8,17 @@ public class PlayerReplayData : ReplayData
 
     public Quaternion playerRotation { get; private set; }
 
-    public bool deatThisFrame { get; private set; }
+    public bool deathThisFrame { get; private set; }
 
     public bool isVisible { get; private set; }
 
-    public PlayerReplayData(Vector3 position, bool isGrounded, Vector3 movement, Quaternion playerRotation, bool deatThisFrame, bool isVisible)
+    public PlayerReplayData(Vector3 position, bool isGrounded, Vector3 movement, Quaternion playerRotation, bool deathThisFrame, bool isVisible)
     {
         this.position = position;
         this.isGrounded = isGrounded;
         this.movement = movement;
         this.playerRotation = playerRotation;
-        this.deatThisFrame = deatThisFrame;
+        this.deathThisFrame = deathThisFrame;
         this.isVisible = isVisible;
     }
 }

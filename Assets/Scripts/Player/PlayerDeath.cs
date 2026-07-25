@@ -13,12 +13,19 @@ public class PlayerDeath : MonoBehaviour
     private PlayerMovement playerMovement;
     private Recorder recorder;
 
+    private bool isDead = false;
+
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.layer == 3) // 3 means harmfullobstacles
+        if (isDead)
+        {
+            return;
+        }
+
+        if (other.gameObject.layer == 3) // 3 means harmfullobstacles
         {
             Debug.Log("death");
-
+            isDead = true;
             rb.useGravity = false;
             rb.linearVelocity = Vector3.zero;
             playerCollider.enabled = false;
@@ -42,17 +49,19 @@ public class PlayerDeath : MonoBehaviour
 
         Respawn();
 
-        recorder.StartNewRecording();
+        //recorder.StartNewRecording();
     }
 
     private void Respawn()
     {
+        isDead = false;
         rb.useGravity = true;
         playerCollider.enabled = enabled;
         playerRenderer.enabled = true;
         this.transform.position = respawnPos.position;
 
-        GameEventsManager.Instance.PlayerRespawn();
+        StartRecordingObject.startRecording = false;
+        //GameEventsManager.Instance.GoalReached();
 
         //PausedControl.Instance.TogglePause();
         //SceneManager.LoadScene("Level1"); // currentlevel

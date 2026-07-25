@@ -25,6 +25,8 @@ public class HarmfulObject : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (!StartRecordingObject.startRecording) return;
+
         ReplayData data = new MovingObjectReplayData(this.transform.position, this.destination.position, this.t);
         recorder.RecordReplayFrame(data);
     }
@@ -37,6 +39,7 @@ public class HarmfulObject : MonoBehaviour
         GameEventsManager.Instance.onGoalReached += OnGoalReached;
         GameEventsManager.Instance.onRestartLevel += OnRestartLevel;
         GameEventsManager.Instance.onPlayerRespawn += OnPlayerRespawn;
+        GameEventsManager.Instance.onPlayerStartLevel += StartLevel;
     }
 
     private void OnDestroy()
@@ -44,6 +47,12 @@ public class HarmfulObject : MonoBehaviour
         GameEventsManager.Instance.onGoalReached -= OnGoalReached;
         GameEventsManager.Instance.onRestartLevel -= OnRestartLevel;
         GameEventsManager.Instance.onPlayerRespawn -= OnPlayerRespawn;
+        GameEventsManager.Instance.onPlayerStartLevel -= StartLevel;
+    }
+
+    private void StartLevel()
+    {
+        recorder.Reset();
     }
 
     private void OnGoalReached()

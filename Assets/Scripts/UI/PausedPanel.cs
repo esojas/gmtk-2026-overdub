@@ -23,6 +23,7 @@ public class PausedPanel : MonoBehaviour
 
     private void RestartLevelGame()
     {
+        GameEventsManager.Instance.RestartLevel();
         PausedControl.Instance.TogglePause();
         SceneManager.LoadScene("Level1");
     }

@@ -8,6 +8,10 @@ public class PlayerReplayObject : ReplayObject
 
     private Renderer cloneRenderer;
 
+    private bool cloneDiedFromObstacle = false;
+
+    private bool cloneIsDead = false;
+
     private void Awake()
     {
         animator = GetComponent<Animator>();
@@ -16,23 +20,47 @@ public class PlayerReplayObject : ReplayObject
         cloneRenderer = GetComponent<Renderer>();
     }
 
+    private void Start()
+    {
+        cloneDiedFromObstacle = false;
+        cloneIsDead = false;
+    }
+
     public override void SetDataForFrame(ReplayData data)
     {
         PlayerReplayData playerData = (PlayerReplayData)data;
 
         this.transform.position = playerData.position;
 
+        this.transform.rotation = playerData.playerRotation;
+
         cloneRenderer.enabled = playerData.isVisible;
 
-        if (playerData.deatThisFrame)
+        if ((playerData.deathThisFrame || cloneDiedFromObstacle) && !cloneIsDead)
         {
+            cloneIsDead = true;
+
             Debug.LogWarning("Clone died");
 
             cloneRenderer.enabled = playerData.isVisible;
 
             Instantiate(deathParticle, this.transform.position, Quaternion.identity);
+
+            Invoke("Death",.01f);
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.layer == 3)
+        {
+            cloneDiedFromObstacle = true;
+        }
+    }
+
+    private void Death()
+    {
+        Destroy(this.gameObject);
+    }
     
 }

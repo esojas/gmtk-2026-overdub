@@ -57,6 +57,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (!StartRecordingObject.startRecording) return;
+
         isVisible = playerRenderer.enabled;
 
         ReplayData data = new PlayerReplayData(this.transform.position, isGrounded(), rb.linearVelocity, this.transform.rotation, deathThisFrame, isVisible);
