@@ -10,13 +10,15 @@ public class PlayerReplayObject : ReplayObject
 
     private bool cloneDiedFromObstacle = false;
 
+    private Rigidbody rb;
+
     private bool cloneIsDead = false;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         //deathParticle = GetComponent<GameObject>();
-
+        rb = GetComponent<Rigidbody>();
         cloneRenderer = GetComponent<Renderer>();
     }
 
@@ -30,9 +32,8 @@ public class PlayerReplayObject : ReplayObject
     {
         PlayerReplayData playerData = (PlayerReplayData)data;
 
-        this.transform.position = playerData.position;
-
-        this.transform.rotation = playerData.playerRotation;
+        rb.MovePosition(playerData.position);
+        rb.MoveRotation(playerData.playerRotation);
 
         cloneRenderer.enabled = playerData.isVisible;
 

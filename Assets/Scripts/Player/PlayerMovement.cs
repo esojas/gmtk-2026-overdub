@@ -14,8 +14,11 @@ public class PlayerMovement : MonoBehaviour
     private Renderer playerRenderer;
 
     [SerializeField] private float movementSpeed;
+    [SerializeField] private float acceleration = 20f;   
+    [SerializeField] private float deceleration = 25f;
     [SerializeField] private float jumpForce;
-    [SerializeField] private float distanceToGround;
+    //[SerializeField] private float distanceToGround;
+    [SerializeField] private float groundCheckRadius;
     [SerializeField] private LayerMask layerToHit;
     [SerializeField] private Camera cam;
     [SerializeField] private Transform playerModel;
@@ -36,6 +39,7 @@ public class PlayerMovement : MonoBehaviour
     {
         playerControlScript = GetComponent<PlayerControl>();
         rb = GetComponent<Rigidbody>();
+        rb.maxDepenetrationVelocity = 2f;
         recorder = GetComponent<Recorder>();
         playerDeathScript = GetComponent<PlayerDeath>();
         playerRenderer = GetComponent<Renderer>();
@@ -52,7 +56,6 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         if (jumpCooldownTimerValue > 0) jumpCooldownTimerValue -= Time.deltaTime;
-        Debug.DrawRay(groundCheck.position, Vector3.down * distanceToGround, Color.red);
     }
 
     private void LateUpdate()
@@ -81,36 +84,28 @@ public class PlayerMovement : MonoBehaviour
     private void Movement()
     {
         Transform cam_Transform = cam.transform;
-
         Vector3 camForward = cam_Transform.forward;
         Vector3 camRight = cam_Transform.right;
 
+        Vector3 inputDir = (camForward * direction.y + camRight * direction.x);
+        inputDir = Vector3.ClampMagnitude(inputDir, 1);
 
-        Vector3 movement = (camForward * direction.y + camRight * direction.x);
+        Vector3 targetVelocity = inputDir * movementSpeed;
+        Vector3 currentHorizontal = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
 
-        movement = Vector3.ClampMagnitude(movement, 1);
+        float rate = (inputDir.sqrMagnitude > 0.0001f) ? acceleration : deceleration;
+        Vector3 newHorizontal = Vector3.MoveTowards(currentHorizontal, targetVelocity, rate * Time.fixedDeltaTime);
 
-        Quaternion targetRotation = Quaternion.Euler(
-        0,                              // X always 0, never tilt
-        cam_Transform.eulerAngles.y,    // Y follows camera horizontal
-        0                               // Z always 0
-        );
+        rb.linearVelocity = new Vector3(newHorizontal.x, rb.linearVelocity.y, newHorizontal.z);
 
-        playerModel.rotation = Quaternion.Slerp(
-             playerModel.rotation,
-             targetRotation,
-             10f * Time.deltaTime
-         );
-
-        rb.linearVelocity = new Vector3(movement.x * movementSpeed, rb.linearVelocity.y, movement.z * movementSpeed);
+        Quaternion targetRotation = Quaternion.Euler(0, cam_Transform.eulerAngles.y, 0);
+        playerModel.rotation = Quaternion.Slerp(playerModel.rotation, targetRotation, 10f * Time.fixedDeltaTime);
     }
 
     private bool isGrounded()
     {
-        Ray groundRay = new Ray(groundCheck.position, Vector3.down);
-        return Physics.Raycast(groundRay, distanceToGround, layerToHit);
+        return Physics.CheckSphere(groundCheck.position, groundCheckRadius, layerToHit);
     }
-
     private void HandleJump()
     {
         if ((jumpPressed && isGrounded()))
@@ -130,5 +125,19 @@ public class PlayerMovement : MonoBehaviour
         HandleJump();
     }
 
+    private void OnDrawGizmos()
+    {
+        if(groundCheck == null)
+        {
+            return;
+        }
 
+        bool grounded = Physics.CheckSphere(groundCheck.position, groundCheckRadius, layerToHit);
+
+        Gizmos.color = grounded ? Color.green : Color.red;
+
+        Vector3 startPos = groundCheck.position;
+
+        Gizmos.DrawWireSphere(startPos, groundCheckRadius);
+    }
 }

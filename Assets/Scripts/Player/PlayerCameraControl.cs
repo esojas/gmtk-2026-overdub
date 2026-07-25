@@ -7,7 +7,7 @@ public class PlayerCameraControl : MonoBehaviour
     public static PlayerCameraControl Instance { get; private set; }
     public float turnSpeed = 4.0f;
     private Transform target;
-    [SerializeField] private float setCameraDistance;
+    [SerializeField] private float setCameraDistance = 0.5f;
     private Transform cameraPosition;
     private float targetDistance;
     public float verticalOffset = 0f;
@@ -53,7 +53,7 @@ public class PlayerCameraControl : MonoBehaviour
         if (target != null) 
         {
             cameraPosition = playerCameraPosition;
-            targetDistance = Vector3.Distance(cameraPosition.position, target.position) * 0.5f;
+            targetDistance = Vector3.Distance(cameraPosition.position, target.position) * setCameraDistance;
         }
         else
         {

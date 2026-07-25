@@ -11,4 +11,17 @@ public class MovingObjectReplayObject : ReplayObject
         //this.transform.localScale = objData.;
 
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.layer == 7)
+        {
+            Invoke("DestroyHarmfulObject", .5f);
+        }
+    }
+
+    private void DestroyHarmfulObject()
+    {
+        Destroy(this.gameObject);
+    }
 }

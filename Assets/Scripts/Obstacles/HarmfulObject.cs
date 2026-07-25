@@ -52,6 +52,8 @@ public class HarmfulObject : MonoBehaviour
 
     private void StartLevel()
     {
+        rendererObject.enabled = true;
+        colliderObject.enabled = true;
         recorder.Reset();
     }
 
@@ -82,4 +84,14 @@ public class HarmfulObject : MonoBehaviour
             this.transform.position = Vector3.Lerp(originPos, destination.position, t);
         }
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.layer == 8 || other.gameObject.layer == 7)
+        {
+            rendererObject.enabled = false;
+            colliderObject.enabled = false;
+        }
+    }
+
 }

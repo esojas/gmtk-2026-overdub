@@ -7,8 +7,8 @@ public class Recorder : MonoBehaviour
     [Header("Prefab to Instantiate")]
     [SerializeField] private GameObject replayObjectPrefab;
 
-    [Header("Camera Targeting")]
-    [SerializeField] private bool newCameraTarget = false;
+    //[Header("Camera Targeting")]
+    //[SerializeField] private bool newCameraTarget = false;
 
     public Queue<ReplayData> recordingQueue { get; private set; }
 

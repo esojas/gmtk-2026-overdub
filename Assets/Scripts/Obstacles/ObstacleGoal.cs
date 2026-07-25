@@ -9,4 +9,11 @@ public class ObstacleGoal : MonoBehaviour
             GameEventsManager.Instance.GoalReached();
         }
     }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+
+        Gizmos.DrawWireCube(transform.position, transform.localScale);
+    }
+
 }
