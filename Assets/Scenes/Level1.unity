@@ -1189,7 +1189,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDeath
   respawnPos: {fileID: 654133162}
   deathParticle: {fileID: 3347966198011942800, guid: a2ba62f545429ba44b7b1a35d28e7806, type: 3}
-  playerLifetime: 30
+  playerCanDie: 0
+  playerLifetime: 5
 --- !u!114 &774429655
 MonoBehaviour:
   m_ObjectHideFlags: 0

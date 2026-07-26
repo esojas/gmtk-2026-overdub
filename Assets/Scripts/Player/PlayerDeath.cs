@@ -7,6 +7,7 @@ public class PlayerDeath : MonoBehaviour
 {
     [SerializeField] private Transform respawnPos;
     [SerializeField] private GameObject deathParticle;
+    [SerializeField] private bool playerCanDie;
     [SerializeField] private float playerLifetime;
     public float timeRemaining { get; private set; }
     private Rigidbody rb;
@@ -36,7 +37,7 @@ public class PlayerDeath : MonoBehaviour
 
     private void HandleDeath()
     {
-        if (isDead)
+        if (isDead||!playerCanDie)
         {
             return;
         }
@@ -119,7 +120,7 @@ public class PlayerDeath : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (StartRecordingObject.startRecording && !isDead)
+        if ((StartRecordingObject.startRecording && !isDead)&& playerCanDie)
         {
             if (timeRemaining > 0)
             {
