@@ -14,7 +14,7 @@ public class Recorder : MonoBehaviour
 
     private List<Recording> recordings;
     private bool isDoingReplay = false;
-    private int replayPlayed = 0;
+    //private int replayPlayed = 0;
 
     private void Awake()
     {

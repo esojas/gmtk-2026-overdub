@@ -3,11 +3,9 @@ using UnityEngine;
 
 public class DoorCrushObstacle : MonoBehaviour
 {
-    [SerializeField] private GameObject doorCrushObject;
-    [SerializeField] private float crushSpeed = 2.0f;
-    private Collider crushCol;
-
-
+    [SerializeField] private DoorButton doorButton;
+    [SerializeField] private float crushSpeed;
+    
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

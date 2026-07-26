@@ -303,7 +303,7 @@ GameObject:
   - component: {fileID: 3413822927028695499}
   - component: {fileID: 697417183996883924}
   - component: {fileID: 8466868147835437994}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ButtonOutline
   m_TagString: Untagged
   m_Icon: {fileID: 0}

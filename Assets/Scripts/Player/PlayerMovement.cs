@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     Ray ray;
     bool jumpPressed = false;
     private float jumpCooldownTimerValue = 0f;
-    private Renderer playerRenderer;
+    [SerializeField] private Renderer playerRenderer;
 
     [SerializeField] private float movementSpeed;
     [SerializeField] private float acceleration = 20f;   
@@ -29,6 +29,11 @@ public class PlayerMovement : MonoBehaviour
     public bool deathThisFrame = false;
     public bool isVisible;
 
+    // For animator
+    public event Action OnJumpExecuted;
+    public bool IsGrounded => isGrounded();
+    public float PlanarSpeed => new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude;
+
     private void OnDestroy()
     {
         playerControlScript.OnMove -= HandleDirection;
@@ -42,7 +47,7 @@ public class PlayerMovement : MonoBehaviour
         rb.maxDepenetrationVelocity = 2f;
         recorder = GetComponent<Recorder>();
         playerDeathScript = GetComponent<PlayerDeath>();
-        playerRenderer = GetComponent<Renderer>();
+        //playerRenderer = GetComponent<Renderer>();
     }
 
     void Start()
@@ -64,7 +69,7 @@ public class PlayerMovement : MonoBehaviour
 
         isVisible = playerRenderer.enabled;
 
-        ReplayData data = new PlayerReplayData(this.transform.position, isGrounded(), rb.linearVelocity, this.transform.rotation, deathThisFrame, isVisible);
+        ReplayData data = new PlayerReplayData(this.transform.position, isGrounded(), rb.linearVelocity, rb.rotation, deathThisFrame, isVisible, jumpPressed);
 
         recorder.RecordReplayFrame(data);
 
@@ -99,7 +104,10 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = new Vector3(newHorizontal.x, rb.linearVelocity.y, newHorizontal.z);
 
         Quaternion targetRotation = Quaternion.Euler(0, cam_Transform.eulerAngles.y, 0);
-        playerModel.rotation = Quaternion.Slerp(playerModel.rotation, targetRotation, 10f * Time.fixedDeltaTime);
+
+        Quaternion newRotation = Quaternion.Slerp(rb.rotation, targetRotation, 10f * Time.fixedDeltaTime);
+
+        rb.MoveRotation(newRotation);
     }
 
     private bool isGrounded()
@@ -115,6 +123,8 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("Jump is pressed!");
             jumpPressed = false;
             jumpCooldownTimerValue = jumpCooldownTimer;
+
+            OnJumpExecuted?.Invoke();
         }
     }
 

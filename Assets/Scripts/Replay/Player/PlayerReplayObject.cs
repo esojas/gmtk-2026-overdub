@@ -6,7 +6,7 @@ public class PlayerReplayObject : ReplayObject
 
     public GameObject deathParticle;
 
-    private Renderer cloneRenderer;
+    public Renderer cloneRenderer;
 
     private bool cloneDiedFromObstacle = false;
 
@@ -14,13 +14,17 @@ public class PlayerReplayObject : ReplayObject
 
     private bool cloneIsDead = false;
 
+    private static readonly int IsGroundedHash = Animator.StringToHash("isGrounded");
+    private static readonly int JumpHash = Animator.StringToHash("Jump");
+    private static readonly int SpeedHash = Animator.StringToHash("Movement");
+
     private void Awake()
     {
-        animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         //deathParticle = GetComponent<GameObject>();
         rb = GetComponent<Rigidbody>();
         rb.maxDepenetrationVelocity = 2f;
-        cloneRenderer = GetComponent<Renderer>();
+        //cloneRenderer = GetComponent<Renderer>();
     }
 
     private void Start()
@@ -34,9 +38,15 @@ public class PlayerReplayObject : ReplayObject
         PlayerReplayData playerData = (PlayerReplayData)data;
 
         rb.MovePosition(playerData.position);
-        rb.MoveRotation(playerData.playerRotation);
+
+        animator.transform.rotation = playerData.playerRotation;
 
         cloneRenderer.enabled = playerData.isVisible;
+
+        animator.SetBool(JumpHash, playerData.isJump);
+        animator.SetBool(IsGroundedHash, playerData.isGrounded);
+        Vector3 vel = playerData.movement;
+        animator.SetFloat(SpeedHash, new Vector3(vel.x, 0, vel.z).magnitude);
 
         if ((playerData.deathThisFrame || cloneDiedFromObstacle) && !cloneIsDead)
         {

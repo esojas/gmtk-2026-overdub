@@ -9,10 +9,10 @@ public class PlayerDeath : MonoBehaviour
     [SerializeField] private GameObject deathParticle;
     [SerializeField] private bool playerCanDie;
     [SerializeField] private float playerLifetime;
+    [SerializeField] private Renderer playerRenderer;
     public float timeRemaining { get; private set; }
     private Rigidbody rb;
     private Collider playerCollider;
-    private Renderer playerRenderer;
     private PlayerMovement playerMovement;
     private Recorder recorder;
 
@@ -106,7 +106,6 @@ public class PlayerDeath : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<Collider>();
         playerMovement = GetComponent<PlayerMovement>();
-        playerRenderer = GetComponent<Renderer>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -125,7 +124,6 @@ public class PlayerDeath : MonoBehaviour
             if (timeRemaining > 0)
             {
                 timeRemaining -= Time.deltaTime;
-                Debug.LogWarning(timeRemaining);
                 if (timeRemaining <= 0)
                 {
                     timeRemaining = 0;
