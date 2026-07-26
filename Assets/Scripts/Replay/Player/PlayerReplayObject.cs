@@ -19,6 +19,7 @@ public class PlayerReplayObject : ReplayObject
         animator = GetComponent<Animator>();
         //deathParticle = GetComponent<GameObject>();
         rb = GetComponent<Rigidbody>();
+        rb.maxDepenetrationVelocity = 2f;
         cloneRenderer = GetComponent<Renderer>();
     }
 

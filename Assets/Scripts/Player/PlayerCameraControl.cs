@@ -8,6 +8,8 @@ public class PlayerCameraControl : MonoBehaviour
     public float turnSpeed = 4.0f;
     private Transform target;
     [SerializeField] private float setCameraDistance = 0.5f;
+    [SerializeField] private float setCameraSmoothness = 1f;
+    private Vector3 smoothedTargetPosition;
     private Transform cameraPosition;
     private float targetDistance;
     public float verticalOffset = 0f;
@@ -50,11 +52,13 @@ public class PlayerCameraControl : MonoBehaviour
     {
         target = playerTarget.transform;
 
-        if (target != null) 
+        if (target != null)
         {
             cameraPosition = playerCameraPosition;
             targetDistance = Vector3.Distance(cameraPosition.position, target.position) * setCameraDistance;
+            smoothedTargetPosition = target.position;
         }
+
         else
         {
             //Debug.LogWarning("CharacterData not found!");
@@ -84,8 +88,11 @@ public class PlayerCameraControl : MonoBehaviour
 
         transform.eulerAngles = new Vector3(-rotX, transform.eulerAngles.y + y, 0);
 
-        float heightOffset = cameraPosition.position.y - target.position.y;
-        transform.position = target.position + new Vector3(0, heightOffset, 0) - (transform.forward * targetDistance);
+        // Smoothly chase the player's position instead of snapping to it
+        smoothedTargetPosition = Vector3.Lerp(smoothedTargetPosition, target.position, setCameraSmoothness * Time.deltaTime);
+
+        float heightOffset = cameraPosition.position.y - smoothedTargetPosition.y;
+        transform.position = smoothedTargetPosition + new Vector3(0, heightOffset, 0) - (transform.forward * targetDistance);
     }
 
     public void DoFOV(float endValue)
